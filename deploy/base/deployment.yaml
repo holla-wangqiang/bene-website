@@ -23,7 +23,7 @@ spec:
             name: cm-bene-website-runtime-config
       containers:
         - name: node-server
-          image: ARTEFACT_IMAGE
+          image: ${IMAGE_NAME}
           resources: {}
           volumeMounts:
             - name: app-config
