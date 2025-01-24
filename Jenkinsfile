@@ -142,7 +142,7 @@ pipeline {
   // 运行环境
   agent {
     kubernetes {
-      label 'typing-ci'
+      label 'typing-ci-go'
       yaml '''
 apiVersion: v1
 kind: Pod
