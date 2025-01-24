@@ -1,7 +1,7 @@
 pipeline {
   environment {
     // 项目信息
-    PROJECT_NAME = ''
+    PROJECT_NAME = 'bene-website'
     REPOSITORY_URL = "https://github.com/holla-world/${PROJECT_NAME}.git"
     // Kubernetes 配置
     KUBECONFIG_PRODUCTION_CREDENTIAL_ID = 'bene-production-kubeconfig'
@@ -33,17 +33,22 @@ pipeline {
             ls -lh
           '''
 
-          // 依赖下载
-          withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'PASSWD', usernameVariable: 'USER')]) {
-            sh '''
-              apk add git
-              git config --global url."https://${USER}:${PASSWD}@github.com".insteadOf "https://github.com"
-              go mod download
-            '''
-          }
-
           // 执行构建
-          sh 'go build -ldflags="-s -w" -o main ./main.go'
+          sh """
+            yarn install --registry https://registry.npmjs.org/
+
+            # 非 stable 分支使用 build:test
+            if [ "${BRANCH_NAME}" == "stable" ]
+            then
+              echo 'build'
+              yarn build
+            else
+              echo 'build:test'
+              yarn build:test
+            fi
+
+            ls -lh
+          """
         }
       }
     }
@@ -142,7 +147,7 @@ pipeline {
   // 运行环境
   agent {
     kubernetes {
-      label 'typing-ci-go'
+      label 'typing-ci-web'
       yaml '''
 apiVersion: v1
 kind: Pod
@@ -168,7 +173,7 @@ spec:
       mountPath: /root/.aws/config
       subPath: config
   - name: builder
-    image: golang:1.22.4-alpine
+    image: docker.io/node:16
     command:
     - cat
     tty: true
