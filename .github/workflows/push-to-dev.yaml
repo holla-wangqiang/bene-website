@@ -23,11 +23,10 @@ jobs:
         id: check-conflicts
         run: |
           git fetch origin ${{ github.ref }}
-          git fetch origin dev
-          git checkout dev
-          # git pull --unshallow
-          # git checkout -b dev origin/dev
-          if git merge ${{ github.ref }} --no-commit --no-ff --allow-unrelated-histories; then
+          git pull --unshallow
+          git checkout -b dev origin/dev
+          # if git merge ${{ github.ref }} --no-commit --no-ff --allow-unrelated-histories; then
+          if git merge ${{ github.ref }} --no-edit; then
             echo "没有冲突"
             echo "has_conflicts=false" >> $GITHUB_OUTPUT
           else
@@ -39,8 +38,8 @@ jobs:
       - name: Merge and push if no conflicts
         if: steps.check-conflicts.outputs.has_conflicts == 'false'
         run: |
-          # 合并分支
-          git merge ${{ github.ref }} --no-ff --allow-unrelated-histories -m "自动合并分支 ${{ github.ref }} 到 dev 分支"
+          # git add ./
+          # git commit -m "Auto merge ${{ github.ref }} to dev"
           git push origin dev
 
       - name: Send Webhook Notification if conflicts exist

@@ -205,7 +205,7 @@ def notifyBuildResult(boolean buildSuccessed) {
     sh """
         curl -X POST https://devops-bot.voya-tool.world/v1/ks/jenkins/build-result \
           -H "Content-Type: application/json" \
-          -d '{"build_successed": ${buildSuccessed}, "full_commit_id": "${FULL_COMMIT_ID}", "branch_name": "${BRANCH_NAME}", "build_number": ${BUILD_NUMBER}, "duration": ${currentBuild.duration}}'
+          -d '{"build_successed": ${buildSuccessed}, "full_commit_id": "${FULL_COMMIT_ID}", "branch_name": "${BRANCH_NAME}", "build_number": ${BUILD_NUMBER}, "duration": ${currentBuild.duration}, "job_name": "${JOB_NAME}"}'
     """
     echo "Pipeline ${buildSuccessed ? 'succeeded' : 'failed'}!"
     echo "${currentBuild.duration}"
