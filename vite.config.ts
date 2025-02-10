@@ -4,7 +4,7 @@ import { globbySync } from 'globby';
 export default defineConfig({
   build: {
     rollupOptions: {
-      input: ['index.html', 'facility.html', 'practice.html', 'delete.html', 'eula.html']
+      input: ['index.html', 'facility.html', 'practice.html', 'delete.html', 'eula.html', 'children.html']
     },
     minify: true,
     sourcemap: false
