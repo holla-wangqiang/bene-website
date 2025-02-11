@@ -3,9 +3,6 @@ pipeline {
     // 项目信息
     PROJECT_NAME = 'bene-website'
     REPOSITORY_URL = "https://github.com/holla-world/${PROJECT_NAME}.git"
-    // Kubernetes 配置
-    KUBECONFIG_PRODUCTION_CREDENTIAL_ID = 'bene-production-kubeconfig'
-    KUBECONFIG_DEVELOPMENT_CREDENTIAL_ID = 'bene-development-kubeconfig'
     // Git commit id
     COMMIT_ID = "${sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()}"
     FULL_COMMIT_ID = "${sh(script: 'git rev-parse HEAD', returnStdout: true).trim()}"
@@ -13,6 +10,9 @@ pipeline {
     REGISTRY_USER = 'AWS'
     REGISTRY_URL = "751415081683.dkr.ecr.ap-southeast-1.amazonaws.com"
     IMAGE_NAME = "${REGISTRY_URL}/typing/${PROJECT_NAME}:${BRANCH_NAME}-${COMMIT_ID}"
+    // Kubernetes 配置
+    KUBECONFIG_PRODUCTION_CREDENTIAL_ID = 'bene-production-kubeconfig'
+    KUBECONFIG_DEVELOPMENT_CREDENTIAL_ID = 'bene-development-kubeconfig'
   }
 
   stages {
