@@ -1,0 +1,56 @@
+name: Push Auto Merge To Dev
+on:
+  # 推送代码后触发
+  push:
+    branches:
+      - feature/* # 新特性分支
+      - bugfix/*  # bug 修复分支
+      - modify/*  # 功能变更分支
+
+jobs:
+  merge_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check for conflicts between branches
+        id: check-conflicts
+        run: |
+          git fetch origin ${{ github.ref }}
+          git pull --unshallow
+          git checkout -b dev origin/dev
+          if git merge ${{ github.ref }} --no-edit --allow-unrelated-histories; then
+            echo "没有冲突"
+            echo "has_conflicts=false" >> $GITHUB_OUTPUT
+          else
+            echo "存在冲突"
+            echo "has_conflicts=true" >> $GITHUB_OUTPUT
+            git merge --abort
+          fi
+
+      - name: Merge and push if no conflicts
+        if: steps.check-conflicts.outputs.has_conflicts == 'false'
+        run: |
+          git push origin dev
+
+      - name: Send Webhook Notification if conflicts exist
+        if: steps.check-conflicts.outputs.has_conflicts == 'true'
+        run: |
+          git checkout ${{ github.ref }}
+          COMMIT_ID=$(git rev-parse HEAD)
+          echo "Latest commit ID of branch: $COMMIT_ID"
+
+          # 发送 Webhook 通知（使用 www-form-urlencoded）
+          WEBHOOK_URL="https://devops-bot.voya-tool.world/v1/github/auto-merge/conflicts"
+          curl -X POST -H "Content-Type: application/x-www-form-urlencoded" \
+              -d "repository=${{ github.repository }}" \
+              -d "source_branch=${{ github.ref }}" \
+              -d "target_branch=dev" \
+              -d "commit_id=$COMMIT_ID" \
+              $WEBHOOK_URL
