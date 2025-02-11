@@ -33,22 +33,31 @@ pipeline {
             ls -lh
           '''
 
-          // 执行构建
+          // 非 stable 分支使用 build:test
+          // 将 dockerfile 中的 build 替换为 build:test
           sh """
-            yarn install --registry https://registry.npmjs.org/
-
-            # 非 stable 分支使用 build:test
-            if [ "${BRANCH_NAME}" == "stable" ]
-            then
-              echo 'build'
-              yarn build
-            else
-              echo 'build:test'
-              yarn build:test
-            fi
-
-            ls -lh
+              if [ "${BRANCH_NAME}" != "stable" ]
+              then
+                sed -i 's/build/build:test/g' Dockerfile
+              fi
           """
+
+          // // 执行构建
+          // sh """
+          //   yarn install --registry https://registry.npmjs.org/
+
+          //   # 非 stable 分支使用 build:test
+          //   if [ "${BRANCH_NAME}" == "stable" ]
+          //   then
+          //     echo 'build'
+          //     yarn build
+          //   else
+          //     echo 'build:test'
+          //     yarn build:test
+          //   fi
+
+          //   ls -lh
+          // """
         }
       }
     }
