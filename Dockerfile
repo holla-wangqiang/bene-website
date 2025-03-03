@@ -7,11 +7,10 @@
 # # RUN apk add --no-cache python3 make g++
 # RUN yarn install && yarn build:test
 
-FROM nginx:stable-alpine
+FROM docker.io/golang:1.22-alpine
 
-COPY dist /usr/share/nginx/html
+WORKDIR /app
 # COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+COPY main /app/main
 
-CMD ["nginx", "-g", "daemon off;"]
