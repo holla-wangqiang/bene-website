@@ -12,5 +12,5 @@ FROM docker.io/golang:1.22-alpine
 WORKDIR /app
 # COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY main /app/main
+COPY dist /app/main
 
